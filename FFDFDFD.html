@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakemce Web Portalı</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary: #ff4757;
+            --primary-dark: #ff1e32;
+            --bg: #f1f2f6;
+            --card-bg: #ffffff;
+            --text-main: #2f3542;
+            --text-muted: #747d8c;
+            --gold: #ffa502;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* HEADER & NAVIGATION */
+        header {
+            width: 100%;
+            background: var(--card-bg);
+            padding: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        h1 { margin: 0; color: var(--primary); font-weight: 800; font-size: 28px; letter-spacing: 1px; }
+        nav { gap: 15px; display: flex; }
+        nav button {
+            background: transparent; border: none; font-size: 16px; font-weight: 600; color: var(--text-muted);
+            cursor: pointer; padding: 10px 15px; border-radius: 8px; transition: 0.3s;
+        }
+        nav button.active, nav button:hover { background: var(--bg); color: var(--primary); }
+
+        /* MAIN CONTAINER */
+        .container { max-width: 1000px; width: 90%; margin: 40px auto; display: none; animation: fadeIn 0.4s ease-in-out; }
+        .container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+
+        /* TYPOGRAPHY & BUTTONS */
+        h2 { margin-top: 0; font-size: 24px; color: var(--text-main); }
+        p.info-text { line-height: 1.8; color: var(--text-muted); font-size: 15px; }
+        
+        .btn {
+            background: var(--primary); color: white; border: none; padding: 12px 25px; font-size: 16px; font-weight: 600;
+            border-radius: 10px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-play { background: #1e90ff; box-shadow: 0 4px 15px rgba(30, 144, 255, 0.3); }
+        .btn-play:hover { background: #0073e6; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; }
+        .btn-outline:hover { background: var(--primary); color: white; }
+
+        /* TRANSLATOR APP */
+        textarea {
+            width: 100%; height: 100px; padding: 15px; border: 2px solid #dfe4ea; border-radius: 12px; font-size: 16px;
+            font-family: inherit; resize: none; margin-bottom: 15px; box-sizing: border-box; transition: 0.3s;
+        }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        .result-box { background: var(--bg); padding: 20px; border-radius: 12px; font-size: 22px; font-weight: 600; min-height: 40px; word-wrap: break-word; }
+
+        /* TEST SECTION */
+        .level-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .level-tab { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; background: #dfe4ea; transition: 0.3s; }
+        .level-tab.active { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); }
+
+        .test-modes { display: flex; gap: 15px; margin-bottom: 20px; background: var(--bg); padding: 15px; border-radius: 15px;}
+        
+        .grid-100 { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        
+        .test-btn-wrapper { background: white; border: 2px solid #dfe4ea; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; min-height: 90px;}
+        .test-btn-wrapper:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .test-title { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+        .test-stats { font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 2px;}
+        .stars { color: var(--gold); font-size: 14px; letter-spacing: 2px; }
+
+        /* QUIZ ACTIVE UI */
+        #quiz-ui { display: none; text-align: center; }
+        .quiz-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin-bottom: 20px; background: var(--bg); padding: 15px; border-radius: 10px;}
+        .question-text { font-size: 24px; font-weight: bold; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid var(--primary); }
+        .quiz-input { width: 100%; font-size: 20px; padding: 15px; border: 2px solid var(--primary); border-radius: 10px; margin-bottom: 20px; text-align: center; box-sizing: border-box; }
+        
+        /* CUSTOM EXAM SETTINGS */
+        .custom-settings { display: none; background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed #ccc; }
+        .setting-group { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .setting-group input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; text-align: center; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    </style>
+</head>
+<body>
+
+<audio id="dorukAudio" src="dorukses.m4a"></audio>
+
+<header>
+    <div class="nav-container">
+        <h1>HAKEMCE PORTALI</h1>
+        <nav>
+            <button class="active" onclick="switchTab('home')">Çeviri & Dinle</button>
+            <button onclick="switchTab('about')">Nedir?</button>
+            <button onclick="switchTab('tests')">Testler</button>
+        </nav>
+    </div>
+</header>
+
+<div id="home" class="container active">
+    <div class="card" style="text-align: center; padding-bottom: 40px;">
+        <h2>Doruk'un Sesinden Hakemce</h2>
+        <p class="info-text" style="margin-bottom: 20px;">Orjinal Hakemce telaffuzunu Doruk'tan dinleyin.</p>
+        <button class="btn btn-play" onclick="document.getElementById('dorukAudio').play()">
+            🔊 DORUK'UN HAKEM DEMESİNİ DİNLE
+        </button>
+    </div>
+
+    <div class="card">
+        <h2>Canlı Hakemce Çeviri</h2>
+        <p class="info-text">İstediğin cümleyi yaz, kelimenin uzunluğuna göre anında çevrilsin.</p>
+        <textarea id="translatorInput" placeholder="Türkçe metni buraya girin (Örn: Yeteeeer!!!!)"></textarea>
+        <div class="result-box" id="translatorOutput">...</div>
+    </div>
+</div>
+
+<div id="about" class="container">
+    <div class="card">
+        <h2>HAKEMCE DİLİ</h2>
+        <p class="info-text" style="font-size: 16px;">
+            Hakemce dili sadece satrançta mevcuttur. Hakemce dilinde tek kelime vardır. Kelime ise "HAKEM" kelimesidir. 
+            Ama her şeye sadece hakem denilmez mesela Türkçe’de merhaba demek Hakemce dilinde söyleniş uzatışına göre hakem demektir. 
+            Mesela üzgünsünüz ve bunu Hakemce diliyle söyleyeceksiniz, Türkçe dilinde amaaa diyoruz ya bazen üzüldüğümüzde, 
+            işte Hakemce dilinde de sakince “Hakeeem” demektir. Bunu bağırarak dersek ise “HAKEEEM” olur mesela. 
+            Yani Hakemce dili tek kelime olsa da bu dili söyleyiş ve yüksek, orta, az sese göre konuşuruz.
+        </p>
+    </div>
+</div>
+
+<div id="tests" class="container">
+    <div class="card" id="test-menu">
+        <h2>Antrenman Merkezi</h2>
+        
+        <div class="level-tabs">
+            <button class="level-tab active" onclick="loadLevels('kolay')">Kolay Seviye</button>
+            <button class="level-tab" onclick="loadLevels('orta')">Orta Seviye</button>
+            <button class="level-tab" onclick="loadLevels('zor')">Zor Seviye</button>
+        </div>
+
+        <div class="test-modes">
+            <button class="btn" style="flex:1" onclick="setMode('hazir')">Hazır Testler (100 Bölüm)</button>
+            <button class="btn btn-outline" style="flex:1" onclick="setMode('duzenle')">⚙️ Düzenle (Özel Test)</button>
+        </div>
+
+        <div id="custom-settings" class="custom-settings">
+            <h3>Testini Düzenle</h3>
+            <div class="setting-group">
+                <label>Soru Sayısı:</label>
+                <input type="number" id="customQ" value="5" min="1" max="50">
+            </div>
+            <div class="setting-group">
+                <label>Süre (Saniye):</label>
+                <input type="number" id="customTime" value="60" min="10" max="300">
+            </div>
+            <button class="btn" style="width:100%" onclick="startCustomTest()">BAŞLA</button>
+        </div>
+
+        <div id="grid-container" class="grid-100">
+            </div>
+    </div>
+
+    <div class="card" id="quiz-ui">
+        <div class="quiz-header">
+            <div id="quiz-timer">⏱️ Süre: 60s</div>
+            <div id="quiz-progress">Soru: 1/10</div>
+            <div id="quiz-score">Puan: 0</div>
+        </div>
+        
+        <h3>Bu metni Hakemce'ye çevir:</h3>
+        <div class="question-text" id="quiz-question">Yükleniyor...</div>
+        
+        <input type="text" id="quiz-input" class="quiz-input" placeholder="Cevabınızı buraya yazın ve Enter'a basın..." autocomplete="off">
+        
+        <button class="btn" onclick="submitAnswer()" style="width:100%">CEVAPLA</button>
+        <button class="btn btn-outline" onclick="endQuiz(false)" style="width:100%; margin-top: 10px;">TESTİ İPTAL ET</button>
+    </div>
+</div>
+
+<script>
+    /* ================= TRANSLATION LOGIC ================= */
+    function wordToHakem(word) {
+        const match = word.match(/^([^a-zA-ZçğıöşüÇĞİÖŞÜ0-9]*)([a-zA-ZçğıöşüÇĞİÖŞÜ0-9]+)([^a-zA-ZçğıöşüÇĞİÖŞÜ0-9]*)$/);
+        if (!match) return word;
+
+        const prefix = match[1];
+        const coreWord = match[2];
+        const suffix = match[3];
+
+        const isAllUpper = coreWord === coreWord.toUpperCase() && coreWord.length > 1;
+        const isFirstUpper = coreWord.charAt(0) === coreWord.charAt(0).toUpperCase();
+
+        let extraLength = coreWord.length - 5;
+        let middleE = "e";
+        if (extraLength > 0) middleE = "e".repeat(1 + extraLength);
+
+        let hakemCore = "hak" + middleE + "m";
+
+        if (isAllUpper) hakemCore = hakemCore.toUpperCase();
+        else if (isFirstUpper) hakemCore = hakemCore.charAt(0).toUpperCase() + hakemCore.slice(1);
+
+        return prefix + hakemCore + suffix;
+    }
+
+    function translateFullText(text) {
+        if (!text) return "";
+        return text.split(/\s+/).map(wordToHakem).join(' ');
+    }
+
+    // Canlı Çevirici Event
+    document.getElementById('translatorInput').addEventListener('input', (e) => {
+        document.getElementById('translatorOutput').innerText = translateFullText(e.target.value) || "...";
+    });
+
+    /* ================= TAB NAVIGATION ================= */
+    function switchTab(tabId) {
+        document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Test sekmesinden çıkılırsa quiz'i kapat menüyü aç
+        if(tabId !== 'tests') endQuiz(false, true);
+    }
+
+    /* ================= QUIZ & TEST SYSTEM ================= */
+    let currentLevel = 'kolay';
+    let quizInterval;
+    let quizState = {
+        active: false,
+        questions: [],
+        currentQIndex: 0,
+        score: 0,
+        timeLeft: 0,
+        totalTime: 0,
+        testId: null, // "kolay_1" etc. If null, it's a custom test
+        totalQuestions: 0
+    };
+
+    // Soru Havuzları
+    const vocab = {
+        kolay: ["Selam", "Evet", "Hayır", "Tamam", "Pardon", "Naber", "Ne", "Kim"],
+        orta: ["Nasılsın bugün?", "İtirazım var!", "Çok iyi", "Bir dakika.", "Anlamadım", "Bence yanlış"],
+        zor: ["Bu maçın sonucu tamamen yanlış hesaplanmış!", "Hakem bey, sürem bittiği için kaybetmedim!!!", "Tebrikler, gerçekten mükemmel oynadın..."]
+    };
+
+    // Random Soru Üretici
+    function generateQuestions(level, count) {
+        let q = [];
+        const pool = vocab[level];
+        for(let i=0; i<count; i++) {
+            let text = pool[Math.floor(Math.random() * pool.length)];
+            // Benzersizlik katmak için bazen harf uzatması veya ünlem ekleyelim
+            if(Math.random() > 0.5) {
+                text = text.replace(/a/g, "aa").replace(/e/g, "ee") + (Math.random() > 0.5 ? "!" : "");
+            }
+            q.push({
+                turkish: text,
+                hakemce: translateFullText(text)
+            });
+        }
+        return q;
+    }
+
+    // Seviye Seçme (Tablar)
+    function loadLevels(level) {
+        currentLevel = level;
+        document.querySelectorAll('.level-tab').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+        renderGrid();
+    }
+
+    function setMode(mode) {
+        if(mode === 'hazir') {
+            document.getElementById('custom-settings').style.display = 'none';
+            document.getElementById('grid-container').style.display = 'grid';
+        } else {
+            document.getElementById('custom-settings').style.display = 'block';
+            document.getElementById('grid-container').style.display = 'none';
+        }
+    }
+
+    // 100 Test Butonunu Ekrana Çizme & LocalStorage'dan Veri Çekme
+    function renderGrid() {
+        const grid = document.getElementById('grid-container');
+        grid.innerHTML = '';
+        
+        for(let i=1; i<=100; i++) {
+            const testId = `${currentLevel}_${i}`;
+            const data = JSON.parse(localStorage.getItem('hakemce_' + testId));
+            
+            let statsHtml = '<span class="stars">☆☆☆</span><span>Henüz çözülmedi</span>';
+            if(data) {
+                let stars = "★".repeat(data.stars) + "☆".repeat(3 - data.stars);
+                statsHtml = `
+                    <span class="stars">${stars}</span>
+                    <span>Puan: ${data.score}</span>
+                    <span>Süre: ${data.timeSpent}s</span>
+                `;
+            }
+
+            const btn = document.createElement('div');
+            btn.className = 'test-btn-wrapper';
+            btn.onclick = () => startTest(testId);
+            btn.innerHTML = `
+                <div class="test-title">Test ${i}</div>
+                <div class="test-stats">${statsHtml}</div>
+            `;
+            grid.appendChild(btn);
+        }
+    }
+
+    // Hazır Test Başlat
+    function startTest(testId) {
+        // Seviyeye göre zorluk ayarları
+        let qCount = currentLevel === 'kolay' ? 5 : currentLevel === 'orta' ? 8 : 10;
+        let time = currentLevel === 'kolay' ? 60 : currentLevel === 'orta' ? 90 : 120;
+        
+        quizState.testId = testId;
+        initQuiz(currentLevel, qCount, time);
+    }
+
+    // Özel Test Başlat
+    function startCustomTest() {
+        const qCount = parseInt(document.getElementById('customQ').value);
+        const time = parseInt(document.getElementById('customTime').value);
+        quizState.testId = null; // Özel test kaydedilmez
+        initQuiz(currentLevel, qCount, time);
+    }
+
+    // Quiz Motoru
+    function initQuiz(level, qCount, time) {
+        quizState.questions = generateQuestions(level, qCount);
+        quizState.totalQuestions = qCount;
+        quizState.currentQIndex = 0;
+        quizState.score = 0;
+        quizState.timeLeft = time;
+        quizState.totalTime = time;
+        quizState.active = true;
+
+        document.getElementById('test-menu').style.display = 'none';
+        document.getElementById('quiz-ui').style.display = 'block';
+        document.getElementById('quiz-input').value = "";
+        
+        updateQuizUI();
+        clearInterval(quizInterval);
+        quizInterval = setInterval(timerTick, 1000);
+        
+        setTimeout(() => document.getElementById('quiz-input').focus(), 100);
+    }
+
+    function timerTick() {
+        quizState.timeLeft--;
+        document.getElementById('quiz-timer').innerText = `⏱️ Süre: ${quizState.timeLeft}s`;
+        if(quizState.timeLeft <= 0) {
+            endQuiz(true); // Zaman bitti
+        }
+    }
+
+    function updateQuizUI() {
+        if(quizState.currentQIndex >= quizState.totalQuestions) {
+            endQuiz(true); // Sorular bitti
+            return;
+        }
+        document.getElementById('quiz-progress').innerText = `Soru: ${quizState.currentQIndex + 1}/${quizState.totalQuestions}`;
+        document.getElementById('quiz-score').innerText = `Puan: ${quizState.score}`;
+        document.getElementById('quiz-question').innerText = quizState.questions[quizState.currentQIndex].turkish;
+        document.getElementById('quiz-input').value = "";
+        document.getElementById('quiz-input').focus();
+    }
+
+    // Enter tuşu ile cevaplama
+    document.getElementById('quiz-input').addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') submitAnswer();
+    });
+
+    function submitAnswer() {
+        if(!quizState.active) return;
+        const answer = document.getElementById('quiz-input').value.trim();
+        const correct = quizState.questions[quizState.currentQIndex].hakemce;
+
+        if(answer === correct) {
+            quizState.score += 10;
+        } else {
+            alert(`Yanlış!\nDoğru cevap: ${correct}`);
+        }
+
+        quizState.currentQIndex++;
+        updateQuizUI();
+    }
+
+    function endQuiz(finished, silent = false) {
+        clearInterval(quizInterval);
+        quizState.active = false;
+        
+        if(finished && !silent) {
+            const timeSpent = quizState.totalTime - quizState.timeLeft;
+            const maxScore = quizState.totalQuestions * 10;
+            const accuracy = quizState.score / maxScore;
+            
+            // Yıldız Hesaplama (Hem hıza hem doğruya göre)
+            let stars = 0;
+            if(accuracy === 1) stars = 3;
+            else if(accuracy >= 0.6) stars = 2;
+            else if(accuracy > 0) stars = 1;
+
+            if(quizState.testId) {
+                // Sadece hazır testleri LocalStorage'a kaydet
+                const resultData = { score: quizState.score, timeSpent: timeSpent, stars: stars };
+                localStorage.setItem('hakemce_' + quizState.testId, JSON.stringify(resultData));
+            }
+
+            alert(`TEST BİTTİ!\nPuan: ${quizState.score}/${maxScore}\nGeçen Süre: ${timeSpent}s\nYıldız: ${stars}`);
+        }
+
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('test-menu').style.display = 'block';
+        renderGrid(); // Grid'i güncel skorlarla yeniden çiz
+    }
+
+    // Sayfa Yüklendiğinde
+    window.onload = () => {
+        loadLevels('kolay'); // İlk açılışta kolay tabını ve gridini yükle
+    };
+
+</script>
+
+</body>
+</html>
